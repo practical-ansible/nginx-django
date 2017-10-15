@@ -10,20 +10,14 @@
     python_env: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/virtualenv'
     uwsgi_project_name: 'django-{{django_project_name}}-{{django_project_environment}}'
 
-- name: Create project directory
+- name: Create directories
   file:
-    path: '{{dir_project}}'
+    path: '{{item}}'
     state: directory
-
-- name: Create project environment directory
-  file:
-    path: '{{dir_project_environment}}'
-    state: directory
-
-- name: Create project environment versions directory
-  file:
-    path: '{{dir_project_environment_versions}}'
-    state: directory
+  with_items:
+    - '{{dir_project}}'
+    - '{{dir_project_environment}}'
+    - '{{dir_project_environment_versions}}'
 
 - name: Get list of versions
   find:
