@@ -1,0 +1,16 @@
+---
+- name: Bring up docker containers
+  hosts: localhost
+  gather_facts: false
+  vars:
+    inventory:
+      - name: django_host_0
+        image: "ubuntu-upstart:14.04"
+  roles:
+    - role: provision_docker
+      provision_docker_inventory: "{{ inventory }}"
+
+- name: Run iptables Tests
+  hosts: docker_containers
+  roles:
+    - role: practical-ansible-web-django
