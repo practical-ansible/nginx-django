@@ -2,7 +2,7 @@
 
 #### Project archive
 
-This role expects you to bundle your django application into archive. We recommend to use [setuptools](https://pypi.python.org/pypi/setuptools) as it is widely used, but a simple zip archive should work as well. Set `django_archive` to path of your archive. Needs to be passed to ansible as extra var.
+This role expects you to bundle your django application into archive. We recommend to use [setuptools](https://pypi.python.org/pypi/setuptools) as it is widely used, but a simple zip archive should work as well. Set `django_archive` to path of your archive.
 
 #### Project environment
 
@@ -28,6 +28,14 @@ Set `django_projects_directory` to path where you usually store django projects.
 
 Set `django_static_dir` to directory where you store static files. Defaults to empty string. We recommend storing static files externally on CDN, for example AWS S3. Looks for environment variable `DJANGO_STATIC_DIR` by default.
 
+#### Django configuration module
+
+Set `django_config` to module path of your Django configuration. For example: 'app.settings'.
+
 #### Extra django configuration template
 
-Set `django_config` to path of external configuration template of your django application.
+Set `django_config_file` to path of external configuration template of your django application.
+
+#### Django wsgi file
+
+Set `django_file_file` to path of wsgi file of your django application.

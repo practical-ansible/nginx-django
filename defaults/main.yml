@@ -1,7 +1,11 @@
 ---
-django_version: 'develop'
-django_projects_directory: '/var/www'
+django_archive: '{{ lookup("env", "DJANGO_ARCHIVE") }}'
+django_config_file: '{{ lookup("env", "DJANGO_CONFIG_FILE") }}'
+django_config: '{{ lookup("env", "DJANGO_CONFIG") }}'
 django_project_environment: 'staging'
 django_project_name: '{{ lookup("env", "DJANGO_PROJECT_NAME") }}'
+django_projects_directory: '/var/www'
 django_server_name: '{{ lookup("env", "DJANGO_SERVER_NAME") }}'
 django_static_dir: '{{ lookup("env", "DJANGO_STATIC_DIR") }}'
+django_version: 'develop'
+django_wsgi_file: '{{ lookup("env", "DJANGO_WSGI_FILE") }}'
