@@ -9,6 +9,7 @@
     python_env: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/virtualenv'
     django_uwsgi_socket_dir: '/run/uwsgi/app/{{django_project_name}}'
     django_uwsgi_socket: '/run/uwsgi/app/{{django_project_name}}/{{django_project_environment}}'
+    project_config_name: 'django-{{django_project_name}}-{{django_project_environment}}'
   changed_when: True
   notify:
     - start nginx

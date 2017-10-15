@@ -1,15 +1,26 @@
 ---
 
-- name: Set deploy facts
-  set_fact:
-    python_env: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/virtualenv'
+- name: Install Ubuntu Software Settings
+  become: true
+  action: apt pkg={{item}} state=present
+  with_items:
+    - software-properties-common
+    - python3-apt
+
+- name: Add certbot repository
+  become: true
+  apt_repository:
+    repo: ppa:certbot/certbot
+    state: present
 
 - name: Remove blocking system dependencies
+  become: true
   action: apt pkg={{item}} state=absent
   with_items:
     - uwsgi-plugin-python
 
 - name: Install system dependencies
+  become: true
   action: apt pkg={{item}} state=present
   with_items:
     - nginx
@@ -17,9 +28,11 @@
     - uwsgi-plugin-python3
     - python3-pip
     - python3-virtualenv
+    - python-certbot-nginx
     - virtualenvwrapper
 
 - name: Install pip dependencies
+  become: true
   pip:
     name: uWSGI
     virtualenv: '{{python_env}}'

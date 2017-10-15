@@ -3,7 +3,16 @@
   become: true
   template:
     src: django-nginx.conf
-    dest: /etc/nginx/sites-enabled/django-{{django_project_name}}-{{django_project_environment}}.conf
+    dest: /etc/nginx/sites-available/{{project_config_name}}.conf
+  notify:
+    - restart nginx
+
+- name: Enable nginx app
+  become: true
+  file:
+    src: /etc/nginx/sites-available/{{project_config_name}}.conf
+    dest: /etc/nginx/sites-enabled/{{project_config_name}}.conf
+    state: link
   notify:
     - restart nginx
 
@@ -17,15 +26,21 @@
   become: true
   template:
       src: django-uwsgi.ini
-      dest: '/etc/uwsgi/apps-available/{{uwsgi_project_name}}.ini'
+      dest: '/etc/uwsgi/apps-available/{{project_config_name}}.ini'
   notify:
     - restart uwsgi
 
 - name: Enable uwsgi app
   become: true
   file:
-      dest: '/etc/uwsgi/apps-enabled/{{uwsgi_project_name}}.ini'
-      src: '/etc/uwsgi/apps-available/{{uwsgi_project_name}}.ini'
+      dest: '/etc/uwsgi/apps-enabled/{{project_config_name}}.ini'
+      src: '/etc/uwsgi/apps-available/{{project_config_name}}.ini'
       state: link
   notify:
     - restart uwsgi
+
+- name: Configure letsencrypt
+  become: true
+  shell: 'certbot -n --nginx --agree-tos --domains {{django_server_name.split(" ") | join(",")}}'
+  register: result
+  changed_when: '"Keeping" not in result.stdout'
