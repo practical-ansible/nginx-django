@@ -1,0 +1,36 @@
+---
+- name: start nginx
+  become: true
+  service:
+    name: nginx
+    state: started
+
+- name: restart nginx
+  become: true
+  service:
+    name: nginx
+    state: restarted
+
+- name: reload nginx
+  become: true
+  service:
+    name: nginx
+    state: reloaded
+
+- name: start uwsgi
+  become: true
+  service:
+    name: uwsgi
+    state: started
+
+- name: restart uwsgi
+  become: true
+  service:
+    name: uwsgi
+    state: restarted
+
+- name: reload uwsgi
+  become: true
+  service:
+    name: uwsgi
+    state: reloaded

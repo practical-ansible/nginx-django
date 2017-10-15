@@ -1,0 +1,7 @@
+---
+django_version: 'develop'
+django_projects_directory: '/var/www'
+django_project_environment: 'staging'
+django_project_name: '{{ lookup("env", "DJANGO_PROJECT_NAME") }}'
+django_server_name: '{{ lookup("env", "DJANGO_SERVER_NAME") }}'
+django_static_dir: '{{ lookup("env", "DJANGO_STATIC_DIR") }}'

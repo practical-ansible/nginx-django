@@ -1,0 +1,19 @@
+---
+- name: Configure facts
+  set_fact:
+    dir_next_version: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/versions/{{django_version}}'
+    dir_project_environment_versions: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/versions'
+    dir_project_environment: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}'
+    dir_project: '{{django_projects_directory}}/{{django_project_name}}'
+    link_current: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/current'
+    python_env: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/virtualenv'
+    django_uwsgi_socket_dir: '/run/uwsgi/app/{{django_project_name}}'
+    django_uwsgi_socket: '/run/uwsgi/app/{{django_project_name}}/{{django_project_environment}}'
+  changed_when: True
+  notify:
+    - start nginx
+    - start uwsgi
+
+- include_tasks: deps.yml
+- include_tasks: deploy.yml
+- include_tasks: config.yml

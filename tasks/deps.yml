@@ -1,0 +1,26 @@
+---
+
+- name: Set deploy facts
+  set_fact:
+    python_env: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/virtualenv'
+
+- name: Remove blocking system dependencies
+  action: apt pkg={{item}} state=absent
+  with_items:
+    - uwsgi-plugin-python
+
+- name: Install system dependencies
+  action: apt pkg={{item}} state=present
+  with_items:
+    - nginx
+    - uwsgi
+    - uwsgi-plugin-python3
+    - python3-pip
+    - python3-virtualenv
+    - virtualenvwrapper
+
+- name: Install pip dependencies
+  pip:
+    name: uWSGI
+    virtualenv: '{{python_env}}'
+    virtualenv_python: python3

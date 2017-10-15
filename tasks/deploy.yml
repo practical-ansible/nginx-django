@@ -1,0 +1,82 @@
+---
+
+- name: Set deploy facts
+  set_fact:
+    dir_next_version: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/versions/{{django_version}}'
+    dir_project_environment_versions: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/versions'
+    dir_project_environment: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}'
+    dir_project: '{{django_projects_directory}}/{{django_project_name}}'
+    link_current: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/current'
+    python_env: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/virtualenv'
+    uwsgi_project_name: 'django-{{django_project_name}}-{{django_project_environment}}'
+
+- name: Create project directory
+  file:
+    path: '{{dir_project}}'
+    state: directory
+
+- name: Create project environment directory
+  file:
+    path: '{{dir_project_environment}}'
+    state: directory
+
+- name: Create project environment versions directory
+  file:
+    path: '{{dir_project_environment_versions}}'
+    state: directory
+
+- name: Get list of versions
+  find:
+    paths: '{{dir_project_environment_versions}}'
+    file_type: directory
+  register: versions
+
+- name: Set config file path
+  set_fact:
+    current_version_config: '{{dir_next_version}}/local_settings.py'
+
+- name: Create next version directory
+  file:
+    path: '{{dir_next_version}}'
+    state: directory
+
+- name: Deploy artifact
+  unarchive:
+    src: '{{django_archive}}'
+    dest: '{{dir_next_version}}'
+    extra_opts: [--strip-components=1]
+  notify:
+    - reload uwsgi
+
+- name: Deploy config
+  template:
+    src: '{{django_config_file}}'
+    dest: '{{current_version_config}}'
+  notify:
+    - reload uwsgi
+  when: '{{django_config_file}}'
+
+- name: Install project pip requirements
+  pip:
+    requirements: '{{dir_next_version}}/requirements.txt'
+    virtualenv: '{{python_env}}'
+    virtualenv_python: python3
+
+- name: Collect static files
+  django_manage:
+    app_path: '{{dir_next_version}}'
+    command: collectstatic
+    virtualenv: '{{python_env}}'
+
+- name: Migrate database
+  django_manage:
+    app_path: '{{dir_next_version}}'
+    command: migrate
+    virtualenv: '{{python_env}}'
+
+- name: Point symlink to next version
+  file:
+    src: '{{dir_next_version}}'
+    dest: '{{link_current}}'
+    state: link
+  notify: restart uwsgi
