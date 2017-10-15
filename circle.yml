@@ -8,4 +8,4 @@ dependencies:
 
 test:
   override:
-    - ansible-playbook tests/main.yml -i tests/inventory
+    - ansible-playbook tests/main.yml -i tests/inventory.yml
