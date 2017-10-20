@@ -2,6 +2,7 @@
 django_archive: '{{ lookup("env", "DJANGO_ARCHIVE") }}'
 django_config_file: '{{ lookup("env", "DJANGO_CONFIG_FILE") }}'
 django_config: '{{ lookup("env", "DJANGO_CONFIG") }}'
+django_max_fileupload_size: '100M'
 django_project_environment: 'staging'
 django_project_name: '{{ lookup("env", "DJANGO_PROJECT_NAME") }}'
 django_projects_directory: '/var/www'
