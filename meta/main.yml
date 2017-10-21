@@ -1,6 +1,7 @@
+---
 galaxy_info:
   author: Pavel Žák
-  description: Deploy your Django project to remote with minimal config
+  description: Deploy your Django project to Nginx with minimal config
   license: MIT
   min_ansible_version: 2.4
   platforms:
@@ -10,5 +11,13 @@ galaxy_info:
 
   galaxy_tags:
     - django
+    - nginx
     - deploy
     - uwsgi
+    - letsencrypt
+    - certbot
+    - http
+    - https
+
+dependencies:
+  - role: practical-ansible.certbot

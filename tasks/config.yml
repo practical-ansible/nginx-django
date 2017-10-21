@@ -71,10 +71,3 @@
   when: ssl_certificate_file.stat.exists == False
   notify:
     - restart nginx
-
-- name: Configure Lets Encrypt renew cron job
-  become: true
-  cron:
-    name: Renew Lets Encrypt certificates
-    weekday: 0
-    job: certbot renew
