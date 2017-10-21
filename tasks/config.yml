@@ -1,17 +1,34 @@
 ---
-- name: Configure nginx config file
+- name: Check SSL certificate file
+  become: true
+  register: ssl_certificate_file
+  stat:
+    path: '{{django_ssl_certificate_path}}'
+
+- name: Configure nginx non-SSL config file
   become: true
   template:
     src: django-nginx.conf
-    dest: /etc/nginx/sites-available/{{project_config_name}}.conf
+    dest: '/etc/nginx/sites-available/{{project_config_name}}.conf'
+  when: ssl_certificate_file.stat.exists == False
+  notify:
+    - restart nginx
+
+- name: Configure nginx SSL config file
+  become: true
+  template:
+    src: django-nginx-ssl.conf
+    dest: '/etc/nginx/sites-available/{{project_config_name}}.conf'
+  when:
+    - ssl_certificate_file.stat.exists == True
   notify:
     - restart nginx
 
 - name: Enable nginx app
   become: true
   file:
-    src: /etc/nginx/sites-available/{{project_config_name}}.conf
-    dest: /etc/nginx/sites-enabled/{{project_config_name}}.conf
+    src: '/etc/nginx/sites-available/{{project_config_name}}.conf'
+    dest: '/etc/nginx/sites-enabled/{{project_config_name}}.conf'
     state: link
   notify:
     - restart nginx
@@ -19,7 +36,7 @@
 - name: Create socket directory
   become: true
   file:
-    path: '{{django_uwsgi_socket_dir}}'
+    path: '{{dir_django_uwsgi_socket}}'
     state: directory
 
 - name: Configure uwsgi app
@@ -39,8 +56,25 @@
   notify:
     - restart uwsgi
 
-- name: Configure letsencrypt
+- name: Configure Lets Eencrypt
   become: true
   shell: 'certbot -n --nginx --agree-tos --domains {{django_server_name.split(" ") | join(",")}}'
-  register: result
-  changed_when: '"Keeping" not in result.stdout'
+  register: certbot_result
+  when: ssl_certificate_file.stat.exists == False
+  changed_when: '"Keeping" not in certbot_result.stdout'
+
+- name: Configure nginx SSL config file
+  become: true
+  template:
+    src: django-nginx-ssl.conf
+    dest: '/etc/nginx/sites-available/{{project_config_name}}.conf'
+  when: ssl_certificate_file.stat.exists == False
+  notify:
+    - restart nginx
+
+- name: Configure Lets Encrypt renew cron job
+  become: true
+  cron:
+    name: Renew Lets Encrypt certificates
+    weekday: 0
+    job: certbot renew

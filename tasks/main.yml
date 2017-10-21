@@ -1,15 +1,22 @@
 ---
 - name: Configure facts
   set_fact:
-    dir_next_version: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/versions/{{django_version}}'
-    dir_project_environment_versions: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/versions'
-    dir_project_environment: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}'
+    dir_django_uwsgi_socket: '/run/uwsgi/app/{{django_project_name}}'
     dir_project: '{{django_projects_directory}}/{{django_project_name}}'
-    link_current: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/current'
-    python_env: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}/virtualenv'
-    django_uwsgi_socket_dir: '/run/uwsgi/app/{{django_project_name}}'
-    django_uwsgi_socket: '/run/uwsgi/app/{{django_project_name}}/{{django_project_environment}}'
+    dir_project_environment: '{{django_projects_directory}}/{{django_project_name}}/{{django_project_environment}}'
+    dir_ssl_certificate: '/etc/letsencrypt/live/{{django_server_name.split(" ")[0]}}'
     project_config_name: 'django-{{django_project_name}}-{{django_project_environment}}'
+
+- name: More facts
+  set_fact:
+    dir_next_version: '{{dir_project_environment}}/versions/{{django_version}}'
+    dir_project_environment_versions: '{{dir_project_environment}}/versions'
+    link_current: '{{dir_project_environment}}/current'
+    python_env: '{{dir_project_environment}}/virtualenv'
+    django_uwsgi_socket: '{{dir_django_uwsgi_socket}}/{{django_project_environment}}'
+    django_ssl_certificate_path: '{{dir_ssl_certificate}}/fullchain.pem'
+    django_ssl_certificate_key_path: '{{dir_ssl_certificate}}/privkey.pem'
+
   changed_when: True
   notify:
     - start nginx
