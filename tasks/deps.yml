@@ -12,7 +12,6 @@
     - virtualenvwrapper
 
 - name: Install pip dependencies
-  become: true
   pip:
     name: uWSGI
     virtualenv: '{{python_env}}'
