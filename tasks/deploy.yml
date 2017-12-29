@@ -57,6 +57,12 @@
     command: migrate
     virtualenv: '{{python_env}}'
 
+- name: Migrate database cache
+  django_manage:
+    app_path: '{{dir_next_version}}'
+    command: createcachetable
+    virtualenv: '{{python_env}}'
+
 - name: Point symlink to next version
   file:
     src: '{{dir_next_version}}'
