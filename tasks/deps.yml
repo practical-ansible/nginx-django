@@ -1,15 +1,18 @@
 ---
 - name: Install system dependencies
   become: true
-  action: apt pkg={{item}} state=present
-  with_items:
-    - nginx
-    - uwsgi
-    - uwsgi-plugin-python3
-    - python3-pip
-    - python3-virtualenv
-    - python-certbot-nginx
-    - virtualenvwrapper
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - nginx
+      - uwsgi
+      - uwsgi-plugin-python3
+      - python3-pip
+      - python3-virtualenv
+      - python-certbot-nginx
+      - virtualenvwrapper
 
 - name: Install pip dependencies
   pip:
