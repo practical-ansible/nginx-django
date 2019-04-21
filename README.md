@@ -1,5 +1,9 @@
 ### Variables
 
+[![CircleCI](https://img.shields.io/circleci/project/github/practical-ansible/nginx-django.svg)](https://circleci.com/gh/practical-ansible/nginx-django)
+[![Quality](https://img.shields.io/ansible/quality/21430.svg)](https://galaxy.ansible.com/practical-ansible/nginx-django)
+[![Downloads](https://img.shields.io/ansible/role/d/21430.svg)](https://galaxy.ansible.com/practical-ansible/nginx-django)
+
 #### Project archive
 
 This role expects you to bundle your django application into archive. We recommend to use [setuptools](https://pypi.python.org/pypi/setuptools) as it is widely used, but a simple zip archive should work as well. Set `django_archive` to path of your archive.
