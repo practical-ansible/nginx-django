@@ -3,14 +3,14 @@
   become: true
   register: ssl_certificate_file
   stat:
-    path: '{{django_ssl_certificate_path}}'
+    path: '{{ django_ssl_certificate_path }}'
 
 - name: Configure nginx non-SSL config file
   become: true
   template:
     src: django-nginx.conf
-    dest: '/etc/nginx/sites-available/{{project_config_name}}.conf'
-  when: ssl_certificate_file.stat.exists == False
+    dest: '/etc/nginx/sites-available/{{ project_config_name }}.conf'
+  when: not ssl_certificate_file.stat.exists
   notify:
     - restart nginx
 
@@ -18,17 +18,17 @@
   become: true
   template:
     src: django-nginx-ssl.conf
-    dest: '/etc/nginx/sites-available/{{project_config_name}}.conf'
+    dest: '/etc/nginx/sites-available/{{ project_config_name }}.conf'
   when:
-    - ssl_certificate_file.stat.exists == True
+    - ssl_certificate_file.stat.exists
   notify:
     - restart nginx
 
 - name: Enable nginx app
   become: true
   file:
-    src: '/etc/nginx/sites-available/{{project_config_name}}.conf'
-    dest: '/etc/nginx/sites-enabled/{{project_config_name}}.conf'
+    src: '/etc/nginx/sites-available/{{ project_config_name }}.conf'
+    dest: '/etc/nginx/sites-enabled/{{ project_config_name }}.conf'
     state: link
   notify:
     - restart nginx
@@ -36,38 +36,38 @@
 - name: Create socket directory
   become: true
   file:
-    path: '{{dir_django_uwsgi_socket}}'
+    path: '{{ dir_django_uwsgi_socket }}'
     state: directory
 
 - name: Configure uwsgi app
   become: true
   template:
       src: django-uwsgi.ini
-      dest: '/etc/uwsgi/apps-available/{{project_config_name}}.ini'
+      dest: '/etc/uwsgi/apps-available/{{ project_config_name }}.ini'
   notify:
     - restart uwsgi
 
 - name: Enable uwsgi app
   become: true
   file:
-      dest: '/etc/uwsgi/apps-enabled/{{project_config_name}}.ini'
-      src: '/etc/uwsgi/apps-available/{{project_config_name}}.ini'
+      dest: '/etc/uwsgi/apps-enabled/{{ project_config_name }}.ini'
+      src: '/etc/uwsgi/apps-available/{{ project_config_name }}.ini'
       state: link
   notify:
     - restart uwsgi
 
 - name: Configure Lets Eencrypt
   become: true
-  shell: 'certbot -n --nginx --agree-tos --domains {{django_server_name.split(" ") | join(",")}}'
+  shell: 'certbot -n --nginx --agree-tos --domains {{ django_server_name.split(" ") | join(",") }}'
   register: certbot_result
-  when: ssl_certificate_file.stat.exists == False
+  when: not ssl_certificate_file.stat.exists
   changed_when: '"Keeping" not in certbot_result.stdout'
 
 - name: Configure nginx SSL config file
   become: true
   template:
     src: django-nginx-ssl.conf
-    dest: '/etc/nginx/sites-available/{{project_config_name}}.conf'
-  when: ssl_certificate_file.stat.exists == False
+    dest: '/etc/nginx/sites-available/{{ project_config_name }}.conf'
+  when: not ssl_certificate_file.stat.exists
   notify:
     - restart nginx

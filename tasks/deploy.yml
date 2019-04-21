@@ -1,71 +1,71 @@
 ---
 - name: Create directories
   file:
-    path: '{{item}}'
+    path: '{{ item }}'
     state: directory
   with_items:
-    - '{{dir_project}}'
-    - '{{dir_project_environment}}'
-    - '{{dir_project_environment_versions}}'
+    - '{{ dir_project }}'
+    - '{{ dir_project_environment }}'
+    - '{{ dir_project_environment_versions }}'
 
 - name: Get list of versions
   find:
-    paths: '{{dir_project_environment_versions}}'
+    paths: '{{ dir_project_environment_versions }}'
     file_type: directory
   register: versions
 
 - name: Set config file path
   set_fact:
-    current_version_config: '{{dir_next_version}}/local_settings.py'
+    current_version_config: '{{ dir_next_version }}/local_settings.py'
 
 - name: Create next version directory
   file:
-    path: '{{dir_next_version}}'
+    path: '{{ dir_next_version }}'
     state: directory
 
 - name: Deploy artifact
   unarchive:
-    src: '{{django_archive}}'
-    dest: '{{dir_next_version}}'
+    src: '{{ django_archive }}'
+    dest: '{{ dir_next_version }}'
     extra_opts: [--strip-components=1]
   notify:
     - reload uwsgi
 
 - name: Deploy config
   template:
-    src: '{{django_config_file}}'
-    dest: '{{current_version_config}}'
+    src: '{{ django_config_file }}'
+    dest: '{{ current_version_config }}'
   notify:
     - reload uwsgi
-  when: django_config_file != ""
+  when: django_config_file | bool
 
 - name: Install project pip requirements
   pip:
-    requirements: '{{dir_next_version}}/requirements.txt'
-    virtualenv: '{{python_env}}'
+    requirements: '{{ dir_next_version }}/requirements.txt'
+    virtualenv: '{{ python_env }}'
     virtualenv_python: python3
 
 - name: Collect static files
   django_manage:
-    app_path: '{{dir_next_version}}'
+    app_path: '{{ dir_next_version }}'
     command: collectstatic
-    virtualenv: '{{python_env}}'
+    virtualenv: '{{ python_env }}'
 
 - name: Migrate database
   django_manage:
-    app_path: '{{dir_next_version}}'
+    app_path: '{{ dir_next_version }}'
     command: migrate
-    virtualenv: '{{python_env}}'
+    virtualenv: '{{ python_env }}'
 
 - name: Migrate database cache
   django_manage:
-    app_path: '{{dir_next_version}}'
+    app_path: '{{ dir_next_version }}'
     command: createcachetable
-    virtualenv: '{{python_env}}'
+    virtualenv: '{{ python_env }}'
 
 - name: Point symlink to next version
   file:
-    src: '{{dir_next_version}}'
-    dest: '{{link_current}}'
+    src: '{{ dir_next_version }}'
+    dest: '{{ link_current }}'
     state: link
   notify: restart uwsgi

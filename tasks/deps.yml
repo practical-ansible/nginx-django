@@ -17,5 +17,5 @@
 - name: Install pip dependencies
   pip:
     name: uWSGI
-    virtualenv: '{{python_env}}'
+    virtualenv: '{{ python_env }}'
     virtualenv_python: python3
