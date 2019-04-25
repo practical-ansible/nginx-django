@@ -37,7 +37,7 @@
     dest: '{{ current_version_config }}'
   notify:
     - reload uwsgi
-  when: django_config_file | bool
+  when: django_config_file
 
 - name: Install project pip requirements
   pip:
